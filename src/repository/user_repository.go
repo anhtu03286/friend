@@ -43,14 +43,10 @@ func (u UserRepository) GetAllUsers() []string {
 }
 
 func (u UserRepository) CreateUser(email string) bool {
-	fmt.Println(email)
-
 	query, err := u.DB.Prepare(`insert into users (email) values (?)`)
-	fmt.Println(query)
 	if err != nil {
 		return false
 	}
-	fmt.Println(query)
 	query.Exec(email)
 	return true
 }
@@ -79,10 +75,7 @@ func (u UserRepository) FindByIds(ids []int64) []string {
 		strIds[i] = strconv.FormatInt(id, 10)
 	}
 
-	stmt := `select x.email
-			from user x
-			where x.id in (%s);
-			`
+	stmt := `select u.email	from users u where u.id in (%s);`
 	query := fmt.Sprintf(stmt, strings.Join(strIds, ","))
 	results, err := u.DB.Query(query)
 	if err != nil {
