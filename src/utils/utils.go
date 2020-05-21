@@ -16,7 +16,7 @@ func IsFormatEmail(email string) bool {
 
 func GetEmailFromText(text string) []string {
 	keys := make(map[string]bool)
-	setEmails := []string{}
+	var setEmails []string
 
 	re := regexp.MustCompile(EMAIL_REGEX)
 	submatchall := re.FindAllString(text, -1)
@@ -31,7 +31,7 @@ func GetEmailFromText(text string) []string {
 }
 
 func RemoveItemFromList(list []int64, item int64) []int64 {
-	newList := []int64{}
+	var newList []int64
 	for _, i := range list {
 		if i != item {
 			newList = append(newList, i)

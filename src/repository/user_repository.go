@@ -25,12 +25,12 @@ func NewUserRepository(db *sql.DB) UserRepository {
 }
 
 func (u UserRepository) GetAllUsers() []string {
-	result, err := u.DB.Query("select email from user")
+	result, err := u.DB.Query("select email from users")
 	if err != nil {
 		panic(err.Error())
 	}
 
-	emails:= []string{}
+	var emails []string
 	for result.Next() {
 		var email string
 		err = result.Scan(&email)
@@ -43,17 +43,21 @@ func (u UserRepository) GetAllUsers() []string {
 }
 
 func (u UserRepository) CreateUser(email string) bool {
-	query, err := u.DB.Prepare(`insert into user (email) values (?)`)
+	fmt.Println(email)
+
+	query, err := u.DB.Prepare(`insert into users (email) values (?)`)
+	fmt.Println(query)
 	if err != nil {
 		return false
 	}
+	fmt.Println(query)
 	query.Exec(email)
 	return true
 }
 
 func (u UserRepository) ExistsByEmail(email string) bool {
 	var id int
-	err := u.DB.QueryRow(`select id from user where email=?`, email).Scan(&id)
+	err := u.DB.QueryRow(`select id from users where email=?`, email).Scan(&id)
 	if err != nil {
 		return false
 	}
@@ -62,14 +66,14 @@ func (u UserRepository) ExistsByEmail(email string) bool {
 
 func (u UserRepository) FindUserIdByEmail(email string) int64 {
 	var id int64
-	err := u.DB.QueryRow("select id from user where email=?", email).Scan(&id)
+	err := u.DB.QueryRow("select id from users where email=?", email).Scan(&id)
 	if err != nil {
 		return -1
 	}
 	return id
 }
 
-func (f UserRepository) FindByIds(ids []int64) []string {
+func (u UserRepository) FindByIds(ids []int64) []string {
 	strIds := make([]string, len(ids))
 	for i, id := range ids {
 		strIds[i] = strconv.FormatInt(id, 10)
@@ -80,7 +84,7 @@ func (f UserRepository) FindByIds(ids []int64) []string {
 			where x.id in (%s);
 			`
 	query := fmt.Sprintf(stmt, strings.Join(strIds, ","))
-	results, err := f.DB.Query(query)
+	results, err := u.DB.Query(query)
 	if err != nil {
 		panic(err)
 	}
